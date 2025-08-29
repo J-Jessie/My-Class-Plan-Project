@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Class Plan - Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
@@ -58,7 +59,7 @@
             color: #333;
         }
         
-        .form-group input {
+        .form-group input, .form-group select {
             width: 100%;
             padding: 14px;
             border: 1px solid #ddd;
@@ -67,7 +68,7 @@
             transition: border 0.3s;
         }
         
-        .form-group input:focus {
+        .form-group input:focus, .form-group select:focus {
             border-color: #4e54c8;
             outline: none;
             box-shadow: 0 0 0 2px rgba(78, 84, 200, 0.2);
@@ -80,7 +81,7 @@
             display: none;
         }
         
-        .form-group.error input {
+        .form-group.error input, .form-group.error select {
             border-color: #e74c3c;
         }
         
@@ -130,6 +131,29 @@
             margin-top: 20px;
             display: none;
         }
+        
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 42px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .user-type-info {
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 8px;
+            font-size: 14px;
+            color: #495057;
+            display: none;
+        }
+        
+        .user-type-info i {
+            color: #4e54c8;
+            margin-right: 5px;
+        }
     </style>
 </head>
 <body>
@@ -152,22 +176,52 @@
                     <div class="error">Please enter a valid email address</div>
                 </div>
                 
+                <div class="form-group" id="user-type-group">
+                    <label for="user-type">I am a...</label>
+                    <select id="user-type" name="user-type">
+                        <option value="">Select user type</option>
+                        <option value="student">Student</option>
+                        <option value="teacher">Teacher</option>
+                        <option value="administrator">Administrator</option>
+                    </select>
+                    <div class="error">Please select your user type</div>
+                    
+                    <div class="user-type-info" id="student-info">
+                        <i class="fas fa-info-circle"></i>
+                        Students can join classes, view assignments, and track progress.
+                    </div>
+                    <div class="user-type-info" id="teacher-info">
+                        <i class="fas fa-info-circle"></i>
+                        Teachers can create classes, assign work, and manage students.
+                    </div>
+                    <div class="user-type-info" id="administrator-info">
+                        <i class="fas fa-info-circle"></i>
+                        Administrators can manage users, courses, and system settings.
+                    </div>
+                </div>
+                
                 <div class="form-group" id="password-group">
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Create a password">
+                    <span class="password-toggle" id="password-toggle">
+                        <i class="far fa-eye"></i>
+                    </span>
                     <div class="error">Password must be at least 8 characters</div>
                 </div>
                 
                 <div class="form-group" id="confirm-password-group">
                     <label for="confirm-password">Confirm Password</label>
                     <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password">
+                    <span class="password-toggle" id="confirm-password-toggle">
+                        <i class="far fa-eye"></i>
+                    </span>
                     <div class="error">Passwords do not match</div>
                 </div>
                 
                 <button type="submit" class="btn">Sign Up</button>
                 
                 <div class="success-message" id="success-message">
-                    Account created successfully! Redirecting to login...
+                    <i class="fas fa-check-circle"></i> Account created successfully! Redirecting to login...
                 </div>
             </form>
             
@@ -182,25 +236,42 @@
             const form = document.getElementById('signup-form');
             const nameInput = document.getElementById('name');
             const emailInput = document.getElementById('email');
+            const userTypeSelect = document.getElementById('user-type');
             const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirm-password');
             const successMessage = document.getElementById('success-message');
+            const passwordToggle = document.getElementById('password-toggle');
+            const confirmPasswordToggle = document.getElementById('confirm-password-toggle');
             
             // Validate on input change
             nameInput.addEventListener('input', () => validateName());
             emailInput.addEventListener('input', () => validateEmail());
+            userTypeSelect.addEventListener('change', () => {
+                validateUserType();
+                showUserTypeInfo();
+            });
             passwordInput.addEventListener('input', () => validatePassword());
             confirmPasswordInput.addEventListener('input', () => validateConfirmPassword());
+            
+            // Toggle password visibility
+            passwordToggle.addEventListener('click', function() {
+                togglePasswordVisibility(passwordInput, this);
+            });
+            
+            confirmPasswordToggle.addEventListener('click', function() {
+                togglePasswordVisibility(confirmPasswordInput, this);
+            });
             
             form.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
                 const isNameValid = validateName();
                 const isEmailValid = validateEmail();
+                const isUserTypeValid = validateUserType();
                 const isPasswordValid = validatePassword();
                 const isConfirmPasswordValid = validateConfirmPassword();
                 
-                if (isNameValid && isEmailValid && isPasswordValid && isConfirmPasswordValid) {
+                if (isNameValid && isEmailValid && isUserTypeValid && isPasswordValid && isConfirmPasswordValid) {
                     // Form is valid - show success message
                     successMessage.style.display = 'block';
                     
@@ -208,11 +279,13 @@
                     console.log('Form submitted successfully');
                     console.log('Name:', nameInput.value);
                     console.log('Email:', emailInput.value);
+                    console.log('User Type:', userTypeSelect.value);
                     
                     // Reset form after successful submission
                     setTimeout(() => {
                         form.reset();
                         successMessage.style.display = 'none';
+                        hideAllUserTypeInfo();
                     }, 3000);
                 }
             });
@@ -241,6 +314,34 @@
                 }
             }
             
+            function validateUserType() {
+                const userTypeGroup = document.getElementById('user-type-group');
+                if (userTypeSelect.value === '') {
+                    userTypeGroup.classList.add('error');
+                    return false;
+                } else {
+                    userTypeGroup.classList.remove('error');
+                    return true;
+                }
+            }
+            
+            function showUserTypeInfo() {
+                // Hide all info first
+                hideAllUserTypeInfo();
+                
+                // Show the selected one
+                const selectedValue = userTypeSelect.value;
+                if (selectedValue) {
+                    document.getElementById(`${selectedValue}-info`).style.display = 'block';
+                }
+            }
+            
+            function hideAllUserTypeInfo() {
+                document.querySelectorAll('.user-type-info').forEach(info => {
+                    info.style.display = 'none';
+                });
+            }
+            
             function validatePassword() {
                 const passwordGroup = document.getElementById('password-group');
                 if (passwordInput.value.length < 8) {
@@ -263,6 +364,16 @@
                 } else {
                     confirmPasswordGroup.classList.remove('error');
                     return true;
+                }
+            }
+            
+            function togglePasswordVisibility(input, toggle) {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggle.innerHTML = '<i class="far fa-eye-slash"></i>';
+                } else {
+                    input.type = 'password';
+                    toggle.innerHTML = '<i class="far fa-eye"></i>';
                 }
             }
         });
