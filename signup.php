@@ -155,20 +155,19 @@
             margin-right: 5px;
         }
         
-        .navigation {
+        .back-to-home {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 15px;
         }
         
-        .navigation a {
-            display: inline-block;
-            margin: 0 10px;
-            color: white;
+        .back-to-home a {
+            color: #4e54c8;
             text-decoration: none;
-            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
         }
         
-        .navigation a:hover {
+        .back-to-home a:hover {
             text-decoration: underline;
         }
     </style>
@@ -245,13 +244,11 @@
             <div class="login-link">
                 Already have an account? <a href="login.php">Log In</a>
             </div>
+            
+            <div class="back-to-home">
+                <a href="index.php"><i class="fas fa-arrow-left"></i> Back to Home</a>
+            </div>
         </div>
-    </div>
-
-    <div class="navigation">
-        <a href="index.php">Home</a>
-        <a href="login.php">Login</a>
-        <a href="signup.php">Sign Up</a>
     </div>
 
     <script>
