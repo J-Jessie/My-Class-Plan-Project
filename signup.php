@@ -154,6 +154,23 @@
             color: #4e54c8;
             margin-right: 5px;
         }
+        
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .navigation a {
+            display: inline-block;
+            margin: 0 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .navigation a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -226,9 +243,15 @@
             </form>
             
             <div class="login-link">
-                Already have an account? <a href="#">Log In</a>
+                Already have an account? <a href="login.php">Log In</a>
             </div>
         </div>
+    </div>
+
+    <div class="navigation">
+        <a href="index.php">Home</a>
+        <a href="login.php">Login</a>
+        <a href="signup.php">Sign Up</a>
     </div>
 
     <script>
@@ -281,12 +304,10 @@
                     console.log('Email:', emailInput.value);
                     console.log('User Type:', userTypeSelect.value);
                     
-                    // Reset form after successful submission
+                    // Redirect to login page after successful signup
                     setTimeout(() => {
-                        form.reset();
-                        successMessage.style.display = 'none';
-                        hideAllUserTypeInfo();
-                    }, 3000);
+                        window.location.href = 'login.php';
+                    }, 2000);
                 }
             });
             
